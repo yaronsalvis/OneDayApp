@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreakSquad - Gemeinsam wachsen. Jeden Tag.</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0908',
+                        darkCard: '#171310',
+                        accentGold: '#d97706',
+                        warmGold: '#f59e0b',
+                        brightGold: '#fbbf24',
+                        brownAccent: '#451a03',
+                        deepAmber: '#78350f'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0b0908;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(23, 19, 16, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(217, 119, 6, 0.15);
+        }
+
+        .glass-panel-hover:hover {
+            border-color: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(217, 119, 6, 0.2);
+        }
+
+        .glass-input {
+            background: rgba(11, 9, 8, 0.8);
+            border: 1px solid rgba(217, 119, 6, 0.2);
+        }
+
+        .glass-input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+            outline: none;
+        }
+
+        /* Custom Gradients */
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 50%, #b45309 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-gradient-bg {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 50%, #78350f 100%);
+        }
+
+        .gold-gradient-bg:hover {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #92400e 100%);
+        }
+
+        /* Animated Glowing Orbs */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0908;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #451a03;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d97706;
+        }
+
+        /* Streak Flame Pulse */
+        @keyframes pulse-flame {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.9)); }
+        }
+        .flame-active {
+            animation: pulse-flame 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen">
+
+    <!-- Ambient Glowing Background Lights -->
+    <div class="glow-orb w-96 h-96 bg-amber-600 top-0 left-1/4"></div>
+    <div class="glow-orb w-80 h-80 bg-amber-900 top-1/3 right-10"></div>
+    <div class="glow-orb w-96 h-96 bg-amber-700 bottom-1/4 left-10"></div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-32 opacity-0 transition-all duration-500 ease-in-out glass-panel p-4 rounded-xl flex items-center space-x-3 max-w-sm border-l-4 border-l-warmGold">
+        <div class="w-10 h-10 rounded-full gold-gradient-bg flex items-center justify-center text-black font-bold text-lg">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <div>
+            <h4 id="toast-title" class="font-bold text-white text-sm">Erfolgreich!</h4>
+            <p id="toast-message" class="text-xs text-gray-300">Du bist jetzt auf der Warteliste.</p>
+        </div>
+    </div>
+
+    <!-- 1. HEADER / NAVIGATION -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-xl gold-gradient-bg flex items-center justify-center text-black font-black text-xl shadow-lg shadow-amber-900/40 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-fire"></i>
+                </div>
+                <span class="text-2xl font-black tracking-wider gold-gradient-text">StreakSquad</span>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
+                <a href="#features" class="hover:text-warmGold transition-colors">Features</a>
+                <a href="#how-it-works" class="hover:text-warmGold transition-colors">So funktioniert's</a>
+                <a href="#demo" class="hover:text-warmGold transition-colors">Live-Demo</a>
+                <a href="#countdown" class="hover:text-warmGold transition-colors">Launch</a>
+            </nav>
+
+            <!-- CTA Button -->
+            <div class="hidden md:flex items-center">
+                <a href="#preregister" class="gold-gradient-bg text-black font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-900/30 hover:shadow-amber-600/50 transition-all transform hover:-translate-y-0.5">
+                    Jetzt voranmelden
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white text-2xl focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-amber-900/20 px-4 pt-4 pb-6 space-y-4">
+            <a href="#features" class="block text-gray-300 hover:text-warmGold py-2 font-medium">Features</a>
+            <a href="#how-it-works" class="block text-gray-300 hover:text-warmGold py-2 font-medium">So funktioniert's</a>
+            <a href="#demo" class="block text-gray-300 hover:text-warmGold py-2 font-medium">Live-Demo</a>
+            <a href="#countdown" class="block text-gray-300 hover:text-warmGold py-2 font-medium">Launch</a>
+            <a href="#preregister" class="block text-center gold-gradient-bg text-black font-bold px-5 py-3 rounded-xl mt-4">
+                Jetzt voranmelden
+            </a>
+        </div>
+    </header>
+
+    <!-- 2. HERO SECTION -->
+    <section class="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <!-- Launch Badge -->
+            <div class="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass-panel border border-amber-500/30 text-warmGold text-sm font-semibold mb-8 animate-pulse">
+                <i class="fa-solid fa-rocket"></i>
+                <span>App-Launch am 1. Januar 2027</span>
+            </div>
+
+            <!-- Main Headline -->
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight max-w-4xl mx-auto mb-6">
+                Gemeinsam wachsen. <br>
+                <span class="gold-gradient-text">Jeden einzelnen Tag.</span>
+            </h1>
+
+            <!-- Subheadline -->
+            <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                Erstelle Challenges mit deinen Freunden, baut gemeinsam epische Streaks auf und haltet euch gegenseitig verantwortlich. Ob 100 Liegestütze, 3 km Joggen oder 30 Min Bibel lesen.
+            </p>
+
+            <!-- Countdown Timer Section -->
+            <div id="countdown" class="max-w-xl mx-auto mb-12">
+                <p class="text-xs uppercase tracking-widest text-amber-500 font-bold mb-4">Countdown zum offiziellen Release</p>
+                <div class="grid grid-cols-4 gap-3 sm:gap-4">
+                    <div class="glass-panel p-3 sm:p-4 rounded-2xl text-center">
+                        <span id="days" class="text-2xl sm:text-4xl font-black text-white">00</span>
+                        <span class="block text-xs text-gray-400 mt-1 uppercase font-semibold">Tage</span>
+                    </div>
+                    <div class="glass-panel p-3 sm:p-4 rounded-2xl text-center">
+                        <span id="hours" class="text-2xl sm:text-4xl font-black text-white">00</span>
+                        <span class="block text-xs text-gray-400 mt-1 uppercase font-semibold">Stunden</span>
+                    </div>
+                    <div class="glass-panel p-3 sm:p-4 rounded-2xl text-center">
+                        <span id="minutes" class="text-2xl sm:text-4xl font-black text-white">00</span>
+                        <span class="block text-xs text-gray-400 mt-1 uppercase font-semibold">Minuten</span>
+                    </div>
+                    <div class="glass-panel p-3 sm:p-4 rounded-2xl text-center">
+                        <span id="seconds" class="text-2xl sm:text-4xl font-black text-amber-500">00</span>
+                        <span class="block text-xs text-gray-400 mt-1 uppercase font-semibold">Sekunden</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- E-Mail Waitlist Form -->
+            <div id="preregister" class="max-w-md mx-auto">
+                <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3">
+                    <input 
+                        type="email" 
+                        required 
+                        placeholder="Deine E-Mail-Adresse..." 
+                        class="glass-input flex-grow px-5 py-4 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none"
+                    >
+                    <button 
+                        type="submit" 
+                        class="gold-gradient-bg text-black font-bold px-8 py-4 rounded-xl shadow-lg shadow-amber-900/40 hover:shadow-amber-500/30 transition-all flex items-center justify-center space-x-2 shrink-0"
+                    >
+                        <span>Sichern</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </form>
+                <p class="text-xs text-gray-500 mt-3">
+                    <i class="fa-solid fa-lock mr-1"></i> Kein Spam. Du erhältst nur exklusiven Vorab-Zugang.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 3. INTERACTIVE DEMO SECTION -->
+    <section id="demo" class="py-20 relative z-10 bg-black/40 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-xs uppercase tracking-widest text-amber-500 font-bold mb-3">Interaktive Vorschau</h2>
+                <h3 class="text-3xl sm:text-5xl font-black">Teste die App-Logik live</h3>
+                <p class="text-gray-400 mt-4 max-w-xl mx-auto">Hake heute deine Aufgaben ab und beobachte, wie dein Streak-Zähler mit deinen Freunden steigt!</p>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8 items-center max-w-5xl mx-auto">
+                
+                <!-- Demo App Screen Mockup -->
+                <div class="lg:col-span-7 glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden border border-amber-500/20 shadow-2xl">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-6 mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-full gold-gradient-bg flex items-center justify-center font-bold text-black">
+                                DF
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Dein Tages-Board</h4>
+                                <p class="text-xs text-gray-400">Gruppe: "Gym & Mind Squad"</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Dynamic Streak Badge -->
+                        <div class="glass-panel px-4 py-2 rounded-2xl flex items-center space-x-2 border border-amber-500/40">
+                            <i id="demo-flame" class="fa-solid fa-fire text-xl text-amber-500 flame-active"></i>
+                            <div>
+                                <span class="block text-xs text-gray-400 leading-none">Streak</span>
+                                <span id="streak-counter" class="text-lg font-black gold-gradient-text leading-none">14 Tage</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task List -->
+                    <div class="space-y-4">
+                        <!-- Task 1 -->
+                        <div id="task-1" onclick="toggleTask(1)" class="task-card p-4 rounded-2xl glass-panel glass-panel-hover transition-all cursor-pointer flex items-center justify-between group">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-600/30 flex items-center justify-center text-amber-500">
+                                    <i class="fa-solid fa-dumbbell"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-sm text-white">100 Liegestütze</h5>
+                                    <p class="text-xs text-gray-400">Tägliches Fitness-Ziel</p>
+                                </div>
+                            </div>
+                            <div class="checkbox-icon w-7 h-7 rounded-lg border-2 border-amber-600/40 flex items-center justify-center transition-all">
+                                <i class="fa-solid fa-check text-xs text-black opacity-0"></i>
+                            </div>
+                        </div>
+
+                        <!-- Task 2 -->
+                        <div id="task-2" onclick="toggleTask(2)" class="task-card p-4 rounded-2xl glass-panel glass-panel-hover transition-all cursor-pointer flex items-center justify-between group">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-600/30 flex items-center justify-center text-amber-500">
+                                    <i class="fa-solid fa-person-running"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-sm text-white">3 km Joggen</h5>
+                                    <p class="text-xs text-gray-400">Ausdauer & Cardio</p>
+                                </div>
+                            </div>
+                            <div class="checkbox-icon w-7 h-7 rounded-lg border-2 border-amber-600/40 flex items-center justify-center transition-all">
+                                <i class="fa-solid fa-check text-xs text-black opacity-0"></i>
+                            </div>
+                        </div>
+
+                        <!-- Task 3 -->
+                        <div id="task-3" onclick="toggleTask(3)" class="task-card p-4 rounded-2xl glass-panel glass-panel-hover transition-all cursor-pointer flex items-center justify-between group">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-600/30 flex items-center justify-center text-amber-500">
+                                    <i class="fa-solid fa-book-bible"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-sm text-white">30 Min Bibel lesen</h5>
+                                    <p class="text-xs text-gray-400">Geistige Routine & Fokus</p>
+                                </div>
+                            </div>
+                            <div class="checkbox-icon w-7 h-7 rounded-lg border-2 border-amber-600/40 flex items-center justify-center transition-all">
+                                <i class="fa-solid fa-check text-xs text-black opacity-0"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Friend Verification Footer in Demo -->
+                    <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-400">
+                        <span class="flex items-center"><i class="fa-solid fa-user-check text-amber-500 mr-2"></i> Verifiziert von Alex & Lukas</span>
+                        <span id="progress-text" class="font-semibold text-amber-400">0 / 3 Erledigt</span>
+                    </div>
+                </div>
+
+                <!-- Explanation / Callout for Demo -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-amber-500">
+                        <h4 class="font-bold text-lg text-white mb-2">So funktioniert deine Demo:</h4>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            Klicke auf die Aufgaben im linken Board. Wenn du alle 3 Aufgaben des Tages erledigst, erhöht sich dein Streak! In der echten App verifizieren deine Freunde dein Ergebnis per Foto-Upload.
+                        </p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs mt-1 shrink-0">1</div>
+                            <p class="text-sm text-gray-300">Wähle individuelle Aufgaben für dich oder dein Team.</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs mt-1 shrink-0">2</div>
+                            <p class="text-sm text-gray-300">Lade einen Fotobeweis hoch (z.B. Lauf-App-Screenshot, Fitness-Selfie).</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs mt-1 shrink-0">3</div>
+                            <p class="text-sm text-gray-300">Dein Squad bestätigt es und dein Streak bleibt am Leben!</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. FEATURES GRID -->
+    <section id="features" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-xs uppercase tracking-widest text-amber-500 font-bold mb-3">Warum StreakSquad?</h2>
+                <h3 class="text-3xl sm:text-5xl font-black">Gebaut für echte Verbindungen & Resultate</h3>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="glass-panel p-8 rounded-3xl glass-panel-hover transition-all group">
+                    <div class="w-14 h-14 rounded-2xl gold-gradient-bg flex items-center justify-center text-black text-2xl font-bold mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Social Proofing</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Schluss mit Ausreden! Aufgaben werden erst als bestanden gewertet, wenn mindestens ein Freund dein Foto oder Video verifiziert hat.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass-panel p-8 rounded-3xl glass-panel-hover transition-all group">
+                    <div class="w-14 h-14 rounded-2xl gold-gradient-bg flex items-center justify-center text-black text-2xl font-bold mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-fire-flame-curved"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Streak & Ranglisten</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Baue deinen persönlichen Streak auf und tritt in Squad-Leaderboards gegen deine Freunde an. Wer hält am längsten durch?
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass-panel p-8 rounded-3xl glass-panel-hover transition-all group">
+                    <div class="w-14 h-14 rounded-2xl gold-gradient-bg flex items-center justify-center text-black text-2xl font-bold mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">100% Flexible Habits</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Körper, Geist & Lifestyle. Erstelle custom Challenges wie 3 km Joggen, 100 Liegestütze, Meditieren oder 30 Min Lesen.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. HOW IT WORKS SECTION -->
+    <section id="how-it-works" class="py-20 relative z-10 bg-black/40 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-xs uppercase tracking-widest text-amber-500 font-bold mb-3">Einfach & Effektiv</h2>
+                <h3 class="text-3xl sm:text-5xl font-black">In 3 Schritten zum Erfolg</h3>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 relative">
+                <!-- Step 1 -->
+                <div class="glass-panel p-8 rounded-2xl text-center relative">
+                    <div class="w-12 h-12 rounded-full border-2 border-amber-500 text-amber-500 font-black flex items-center justify-center mx-auto mb-4 text-lg">1</div>
+                    <h4 class="font-bold text-white text-lg mb-2">Squad gründen</h4>
+                    <p class="text-gray-400 text-sm">Lade deine engsten Freunde ein und erstellt eure gemeinsame Challenge-Gruppe.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="glass-panel p-8 rounded-2xl text-center relative">
+                    <div class="w-12 h-12 rounded-full border-2 border-amber-500 text-amber-500 font-black flex items-center justify-center mx-auto mb-4 text-lg">2</div>
+                    <h4 class="font-bold text-white text-lg mb-2">Ziele festlegen</h4>
+                    <p class="text-gray-400 text-sm">Bestimmt tägliche Aufgaben – ob Sport, Lesen oder Achtsamkeit.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="glass-panel p-8 rounded-2xl text-center relative">
+                    <div class="w-12 h-12 rounded-full border-2 border-amber-500 text-amber-500 font-black flex items-center justify-center mx-auto mb-4 text-lg">3</div>
+                    <h4 class="font-bold text-white text-lg mb-2">Haken & Proofen</h4>
+                    <p class="text-gray-400 text-sm">Hake erledigte Aufgaben ab, lade Proofs hoch und sichert euch den Streak!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. COMMUNITY / MOTIVATION SECTION -->
+    <section class="py-24 relative z-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="glass-panel p-10 sm:p-16 rounded-3xl border border-amber-500/30 relative overflow-hidden">
+                <div class="glow-orb w-64 h-64 bg-amber-600 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+                <div class="relative z-10">
+                    <i class="fa-solid fa-quote-left text-4xl text-amber-500/40 mb-6 block"></i>
+                    <h3 class="text-2xl sm:text-4xl font-black text-white leading-snug mb-6">
+                        "Alleine ist man schneller, aber zusammen kommt man weiter. Gemeinsam machen Disziplin und Gewohnheiten endlich Spaß."
+                    </h3>
+                    <p class="text-amber-500 font-bold tracking-wider uppercase text-sm">Warum Zusammen besser ist als Allein</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. FOOTER -->
+    <footer class="border-t border-white/10 bg-darkBg relative z-10 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+                <!-- Brand -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg gold-gradient-bg flex items-center justify-center text-black font-black">
+                        <i class="fa-solid fa-fire text-sm"></i>
+                    </div>
+                    <span class="text-xl font-black text-white tracking-wider">StreakSquad</span>
+                </div>
+
+                <!-- Launch Note -->
+                <p class="text-xs text-gray-400">
+                    <i class="fa-solid fa-calendar-days text-amber-500 mr-2"></i>
+                    Offizieller Launch: <span class="text-white font-semibold">1. Januar 2027</span>
+                </p>
+
+                <!-- Social Links -->
+                <div class="flex space-x-4 text-gray-400">
+                    <a href="#" class="hover:text-amber-500 transition-colors w-9 h-9 rounded-full glass-panel flex items-center justify-center"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="hover:text-amber-500 transition-colors w-9 h-9 rounded-full glass-panel flex items-center justify-center"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="#" class="hover:text-amber-500 transition-colors w-9 h-9 rounded-full glass-panel flex items-center justify-center"><i class="fa-brands fa-x-twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500">
+                <p>&copy; 2026-2027 StreakSquad App. Alle Rechte vorbehalten.</p>
+                <div class="flex space-x-6 mt-4 sm:mt-0">
+                    <a href="#" class="hover:text-gray-400">Impressum</a>
+                    <a href="#" class="hover:text-gray-400">Datenschutz</a>
+                    <a href="#" class="hover:text-gray-400">AGB</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ------------------------------------
+        // 1. COUNTDOWN TIMER LOGIC
+        // ------------------------------------
+        const launchDate = new Date('January 1, 2027 00:00:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = launchDate - now;
+
+            if (distance < 0) {
+                document.getElementById('days').innerText = '00';
+                document.getElementById('hours').innerText = '00';
+                document.getElementById('minutes').innerText = '00';
+                document.getElementById('seconds').innerText = '00';
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+            document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+            document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // ------------------------------------
+        // 2. INTERACTIVE DEMO LOGIC
+        // ------------------------------------
+        let completedTasks = { 1: false, 2: false, 3: false };
+        let baseStreak = 14;
+
+        function toggleTask(taskId) {
+            completedTasks[taskId] = !completedTasks[taskId];
+            const card = document.getElementById(`task-${taskId}`);
+            const checkIcon = card.querySelector('.checkbox-icon');
+            const checkMark = checkIcon.querySelector('i');
+
+            if (completedTasks[taskId]) {
+                // Style Active
+                card.classList.add('bg-amber-950/40', 'border-amber-500/50');
+                checkIcon.classList.add('gold-gradient-bg', 'border-amber-400');
+                checkIcon.classList.remove('border-amber-600/40');
+                checkMark.classList.remove('opacity-0');
+            } else {
+                // Style Inactive
+                card.classList.remove('bg-amber-950/40', 'border-amber-500/50');
+                checkIcon.classList.remove('gold-gradient-bg', 'border-amber-400');
+                checkIcon.classList.add('border-amber-600/40');
+                checkMark.classList.add('opacity-0');
+            }
+
+            // Update Progress & Streak Counter
+            const count = Object.values(completedTasks).filter(Boolean).length;
+            document.getElementById('progress-text').innerText = `${count} / 3 Erledigt`;
+
+            const counterEl = document.getElementById('streak-counter');
+            if (count === 3) {
+                counterEl.innerText = `${baseStreak + 1} Tage 🎉`;
+                showToast('Super!', 'Alle Tagesziele erreicht! Dein Streak steigt!');
+            } else {
+                counterEl.innerText = `${baseStreak} Tage`;
+            }
+        }
+
+        // ------------------------------------
+        // 3. WAITLIST FORM & TOAST NOTIFICATION
+        // ------------------------------------
+        const form = document.getElementById('waitlist-form');
+        const toast = document.getElementById('toast');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            showToast('Erfolgreich eingetragen!', 'Du hast dir deinen Platz für den Launch gesichert.');
+            form.reset();
+        });
+
+        function showToast(title, message) {
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-message').innerText = message;
+
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-32', 'opacity-0');
+            }, 4000);
+        }
+
+        // ------------------------------------
+        // 4. MOBILE MENU TOGGLE
+        // ------------------------------------
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
